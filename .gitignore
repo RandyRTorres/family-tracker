@@ -1,0 +1,5 @@
+node_modules/
+data.json
+*.service
+start.sh
+healthcheck.sh
