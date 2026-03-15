@@ -15,6 +15,10 @@ const wss = new WebSocket.Server({ server });
 
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
+const TZ = 'America/New_York';
+
+function nowET() { return new Date().toLocaleDateString('en-CA', {timeZone: TZ}); }
+function timeET() { return new Date().toLocaleTimeString('en-US', {timeZone: TZ, hour: 'numeric', minute: '2-digit'}); }
 
 // ---- Default Data ----
 function getDefaults() {
@@ -104,17 +108,17 @@ app.post('/api/update', (req, res) => {
         DATA.progress[date][mid][tid] = count;
         DATA.actLog.push({
             mid, tid, action: count > (DATA.progress[date]?.[mid]?.[tid] ?? 0) ? 'complete' : 'undo',
-            date, time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+            date, time: timeET()
         });
         if (DATA.actLog.length > 500) DATA.actLog = DATA.actLog.slice(-500);
     }
     else if (type === 'rewardRedeem') {
         const { mid, reward } = payload;
-        DATA.rewardLog.push({ mid, ...reward, date: new Date().toISOString().slice(0, 10) });
+        DATA.rewardLog.push({ mid, ...reward, date: nowET() });
         DATA.actLog.push({
             mid, tid: null, action: 'reward', detail: reward.name,
-            date: new Date().toISOString().slice(0, 10),
-            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+            date: nowET(),
+            time: timeET()
         });
     }
     else if (type === 'parentEdit') {
@@ -124,7 +128,7 @@ app.post('/api/update', (req, res) => {
         DATA.progress[date][mid][tid] = count;
         DATA.actLog.push({
             mid, tid, action: 'edit (parent)', date,
-            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+            time: timeET()
         });
     }
     else if (type === 'updateTasks') {
@@ -140,7 +144,7 @@ app.post('/api/update', (req, res) => {
         DATA.settings = payload.settings;
     }
     else if (type === 'resetToday') {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = nowET();
         delete DATA.progress[today];
     }
     else if (type === 'resetAll') {

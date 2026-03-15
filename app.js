@@ -82,11 +82,11 @@ let user = null, screen = 'login', selDate = today(), selCat = 'all', tab = 'tas
 let parentEditChild = null, parentEditDate = null;
 
 // =========== UTILS ===========
-function today() { return new Date().toISOString().slice(0,10); }
+function today() { return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}); }
 function fmtDate(ds) {
     if(ds===today()) return '📅 Today';
-    const y=new Date(); y.setDate(y.getDate()-1);
-    if(ds===y.toISOString().slice(0,10)) return '📅 Yesterday';
+    const y=addDays(today(),-1);
+    if(ds===y) return '📅 Yesterday';
     return new Date(ds+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
 function addDays(ds,n){const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
